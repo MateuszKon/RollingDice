@@ -1,23 +1,18 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from typing import Union
 
-from logic.result.skill_roll_result_generator import IResult
+from dice.result.result import Result
+from dice.skill_roll import ExtraDiceType
 
 
-class ExtraDiceType(Enum):
-    BONUS = 1
-    PENALTY = 2
-
-
-class IRolling(ABC):
+class IRollingController(ABC):
 
     @abstractmethod
-    def roll_test(
+    def roll_skill_test(
             self,
             extra_dices_number: int = 0,
             extra_dices_type: Union[ExtraDiceType, None] = None
-    ) -> IResult:
+    ) -> Result:
         """
         Make test roll (d100) with optionally some extra dices
         :param extra_dices_number: number of extra dices rolled
@@ -32,3 +27,8 @@ class IRolling(ABC):
     @abstractmethod
     def roll_custom(self):
         pass
+
+
+class RollingController(IRollingController):
+
+    pass

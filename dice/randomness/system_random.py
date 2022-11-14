@@ -1,6 +1,6 @@
 from random import Random
 
-from logic.randomness.i_random_generator import IRandomGenerator
+from dice.randomness.i_random_generator import IRandomGenerator
 
 
 class RollGenerator(IRandomGenerator):

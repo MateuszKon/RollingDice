@@ -1,8 +1,8 @@
 from typing import Iterator, Type
 
-from logic.dice.i_dice import IDice
-from logic.randomness.i_random_generator import IRandomGenerator
-from logic.result.skill_roll_result_generator import IResult
+from dice.i_dice import IDice
+from dice.randomness.i_random_generator import IRandomGenerator
+from dice.result.result import Result, ResultFactory
 
 
 class Dice(IDice):
@@ -11,28 +11,29 @@ class Dice(IDice):
             self,
             sides: int,
             generator: IRandomGenerator,
-            f_result: Type[IResult],
-            *args,
-            **kwargs
+            result_factory: ResultFactory,
     ):
-        super().__init__(sides)
+        self.sides = sides
         self.generator = generator
-        self.f_result = f_result
+        self.result_factory = result_factory
 
-    def roll(self) -> IResult:
-        return self.f_result(self.generator.random_int(self.sides))
+    def roll(self) -> Result:
+        return self.result_factory(self._roll_dice())
 
-    def rolls(self, n: int) -> Iterator[IResult]:
+    def rolls(self, n: int) -> Iterator[Result]:
         i = 0
         while i < n:
             yield self.roll()
             i += 1
 
+    def _roll_dice(self) -> int:
+        return self.generator.random_int(self.sides)
+
 
 if __name__ == "__main__":
     from random import SystemRandom
-    from logic.randomness.system_random import RollGenerator
-    from logic.result.skill_roll_result_generator import RollResultsGenerator
+    from dice.randomness.system_random import RollGenerator
+    from dice.result import RollResultsGenerator
     d10 = Dice(10, RollGenerator(SystemRandom), RollResultsGenerator(1, 10))
     for roll in d10.rolls(20):
         print(roll)
