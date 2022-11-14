@@ -1,9 +1,21 @@
+from abc import ABC, abstractmethod
 from typing import Iterator
 
 from logic.randomness.i_random_generator import IRandomGenerator
 
 
-class Dice:
+class IDice(ABC):
+
+    @abstractmethod
+    def roll(self) -> int:
+        pass
+
+    @abstractmethod
+    def rolls(self, n: int) -> Iterator[int]:
+        pass
+
+
+class Dice(IDice):
 
     def __init__(self, generator: IRandomGenerator, sides: int):
         self.generator = generator
