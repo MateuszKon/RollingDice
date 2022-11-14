@@ -1,30 +1,28 @@
-from abc import ABC, abstractmethod
-from typing import Iterator
+from typing import Iterator, Type
 
+from logic.dice.i_dice import IDice
 from logic.randomness.i_random_generator import IRandomGenerator
-
-
-class IDice(ABC):
-
-    @abstractmethod
-    def roll(self) -> int:
-        pass
-
-    @abstractmethod
-    def rolls(self, n: int) -> Iterator[int]:
-        pass
+from logic.result.skill_roll_result_generator import IResult
 
 
 class Dice(IDice):
 
-    def __init__(self, generator: IRandomGenerator, sides: int):
+    def __init__(
+            self,
+            sides: int,
+            generator: IRandomGenerator,
+            f_result: Type[IResult],
+            *args,
+            **kwargs
+    ):
+        super().__init__(sides)
         self.generator = generator
-        self.sides = sides
+        self.f_result = f_result
 
-    def roll(self) -> int:
-        return self.generator.random_int(self.sides)
+    def roll(self) -> IResult:
+        return self.f_result(self.generator.random_int(self.sides))
 
-    def rolls(self, n: int) -> Iterator[int]:
+    def rolls(self, n: int) -> Iterator[IResult]:
         i = 0
         while i < n:
             yield self.roll()
@@ -34,9 +32,11 @@ class Dice(IDice):
 if __name__ == "__main__":
     from random import SystemRandom
     from logic.randomness.system_random import RollGenerator
-    d10 = Dice(RollGenerator(SystemRandom), 10)
+    from logic.result.skill_roll_result_generator import RollResultsGenerator
+    d10 = Dice(10, RollGenerator(SystemRandom), RollResultsGenerator(1, 10))
     for roll in d10.rolls(20):
         print(roll)
+        print(roll.json)
 
     # Testing randomness (histogram) of rolling
     # NUMBER_OF_ROLLS = 10000
